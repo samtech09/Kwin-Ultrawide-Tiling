@@ -1,16 +1,30 @@
-TIL3R
-=====
+# Ultrawide-Tiling (kwinscript for KDE/Plasma)
 
-TIL3R adds more manual tiling options to KWin. With this script you can divide you screen in thirds, using the full or half screen height.
+This KWin script provides a set of shortcuts for easily "tiling" windows in halves, thirds, or sixths.
+This is useful especially for ultrawide monitors.
 
+## Installation
 
-__Stuff that could be done:__
-- multimonitor testing and support [done?]
-- maximize windows in certain directions, e.g.
-  - Meta+Alt+Left: keep height, but stretch window to left border
-  - Meta+Alt+Down: keep width, but stretch window to lower border
-  - etc.
-- changing the shortcuts to the following:
-  - Meta+Alt+[NUMBER]: Tile horizontally, full height
-  - Meta+Ctrl+[SOME_KEY]: switch to half height
-- saving the window properties (size, pos) and adding a callback to restore the old size when the window gets moved by the user again (like the normal KWin tiling does)
+To install, clone this repo and run:
+
+```bash
+plasmapkg2 --type kwinscript -i /path/to/Kwin-Ultrawide-Tiling
+```
+
+To update the installed script after updating this repo:
+
+```bash
+plasmapkg2 --type kwinscript -i /path/to/Kwin-Ultrawide-Tiling
+```
+
+To uninstall: 
+
+```bash
+plasmapkg2 --type kwinscript -r Ultrawide-Tiling
+```
+
+## Usage
+
+Once installed, make sure the script is selected in the "Kwin Scripts" settings panel and restat your KDE/Plasma session.
+You should now see a set of keyboard shortcuts in the "Kwin" Global Shortcuts panel.
+Set them to what you'd like and apply!
