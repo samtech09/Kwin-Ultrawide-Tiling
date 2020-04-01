@@ -27,6 +27,10 @@ plasmapkg2 --type kwinscript -r Ultrawide-Tiling
 
 You can also clone this repo and use the above commands to install/update by pointing `plasmapkg2` to the repo directory instead of the `.kwinscript` file.
 
+### Distro packages
+
+- Arch Linux: [`kwin-scripts-ultrawide-tiling`](https://aur.archlinux.org/packages/kwin-scripts-ultrawide-tiling) AUR package
+
 ## Usage
 
 Once installed, make sure the script is selected in the "Kwin Scripts" settings panel and restart your KDE/Plasma session.
