@@ -80,9 +80,9 @@ var isIgnored = function(client) {
 };
 
 var resizeAndMove = function(size_dividend, size_multiple, pos_dividend, pos_index){
-  print("Ultrawide tiling called with args: " + size_dividend + ", " + size_multiple + ", " + pos_dividend + ", " + pos_index);
+  print("Ultrawide tiling called to resize and move with args: " + size_dividend + ", " + size_multiple + ", " + pos_dividend + ", " + pos_index);
   if (isIgnored(activeClient)) {
-    print("client ignored, no resize and move");
+    print("client ignored, not resizing or moving");
     return;
   }
 
@@ -99,14 +99,26 @@ var resizeAndMove = function(size_dividend, size_multiple, pos_dividend, pos_ind
   // width
   geo.width = (workGeo.width / size_dividend) * size_multiple;
 
+  // HACK: unset "maximized" since kwin doesn't do it when you resize an already-maximized window with .geometry
+  activeClient.setMaximize(false, false);
+
   print("new geometry is x: " + geo.x + " y: " + geo.y + " width: " + geo.width + " height: " + geo.height);
   activeClient.geometry = geo;
+}
+
+var maximize = function(){
+  print("Ultrawide tiling called to maximize window");
+  if (isIgnored(activeClient)) {
+    print("client ignored, not maximizing");
+    return;
+  }
+  activeClient.setMaximize(true, true);
 }
 
 print("Ultrawide tiling is active");
 
 // fullscreen
-registerShortcut("ULTRAWIDE TILING: Full", "ULTRAWIDE TILING: Full", "", function () {resizeAndMove(1, 1, 1, 0)});
+registerShortcut("ULTRAWIDE TILING: Full", "ULTRAWIDE TILING: Full", "", function () {maximize()});
 
 // halves
 registerShortcut("ULTRAWIDE TILING: 1/2 Center", "ULTRAWIDE TILING: 1/2 Center", "", function () {resizeAndMove(2, 1, 4, 1)});
