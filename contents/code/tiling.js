@@ -79,8 +79,8 @@ var isIgnored = function(client) {
     return false;
 };
 
-var resizeAndMove = function(size_dividend, size_multiple, pos_dividend, pos_index){
-  print("Ultrawide tiling called to resize and move with args: " + size_dividend + ", " + size_multiple + ", " + pos_dividend + ", " + pos_index);
+var resizeAndMove = function(width_dividend, width_multiple, xpos_dividend, xpos_index, height_dividend, ypos_index){
+  print("Ultrawide tiling called to resize and move with args: " + width_dividend + ", " + width_multiple + ", " + xpos_dividend + ", " + xpos_index);
   if (isIgnored(activeClient)) {
     print("client ignored, not resizing or moving");
     return;
@@ -89,15 +89,23 @@ var resizeAndMove = function(size_dividend, size_multiple, pos_dividend, pos_ind
   var workGeo = workspace.clientArea(KWin.PlacementArea, activeClient.screen, 1);
   var geo = activeClient.geometry;
 
-  // vertical geometry should be top-to-bottom
-  geo.y = workGeo.y;
-  geo.height = workGeo.height;
-
+  if (height_dividend > 1) {
+    // set height
+    geo.height = workGeo.height / height_dividend;
+    
+    // vertical position (from left edge)
+    geo.y = (workGeo.height / height_dividend) * ypos_index;
+  } else {
+    // vertical geometry should be top-to-bottom
+    geo.y = workGeo.y;
+    geo.height = workGeo.height;
+  }
+  
   // horizontal position (from left edge)
-  geo.x = (workGeo.width / pos_dividend) * pos_index;
+  geo.x = (workGeo.width / xpos_dividend) * xpos_index;
 
   // width
-  geo.width = (workGeo.width / size_dividend) * size_multiple;
+  geo.width = (workGeo.width / width_dividend) * width_multiple;
 
   // HACK: unset "maximized" since kwin doesn't do it when you resize an already-maximized window with .geometry
   activeClient.setMaximize(false, false);
@@ -118,22 +126,46 @@ var maximize = function(){
 print("Ultrawide tiling is active");
 
 // fullscreen
-registerShortcut("ULTRAWIDE TILING: Full", "ULTRAWIDE TILING: Full", "", function () {maximize()});
+registerShortcut("ULTRAWIDE TILING: Full", "ULTRAWIDE TILING: Full", "Meta+Ctrl+F", function () {maximize()});
 
-// halves
-registerShortcut("ULTRAWIDE TILING: 1/2 Center", "ULTRAWIDE TILING: 1/2 Center", "", function () {resizeAndMove(2, 1, 4, 1)});
-registerShortcut("ULTRAWIDE TILING: 1/2 Left", "ULTRAWIDE TILING: 1/2 Left", "", function () {resizeAndMove(2, 1, 2, 0)});
-registerShortcut("ULTRAWIDE TILING: 1/2 Right", "ULTRAWIDE TILING: 1/2 Right", "", function () {resizeAndMove(2, 1, 2, 1)});
+// halves - full height
+registerShortcut("ULTRAWIDE TILING: 1/2 Center", "ULTRAWIDE TILING: 1/2 Center", "", function () {resizeAndMove(2, 1, 4, 1, 1, 1)});
+registerShortcut("ULTRAWIDE TILING: 1/2 Left", "ULTRAWIDE TILING: 1/2 Left", "", function () {resizeAndMove(2, 1, 2, 0, 1, 1)});
+registerShortcut("ULTRAWIDE TILING: 1/2 Right", "ULTRAWIDE TILING: 1/2 Right", "", function () {resizeAndMove(2, 1, 2, 1, 1, 1)});
 
-// thirds
-registerShortcut("ULTRAWIDE TILING: 1/3 Left", "ULTRAWIDE TILING: 1/3 Left", "", function () {resizeAndMove(3, 1, 3, 0)});
-registerShortcut("ULTRAWIDE TILING: 1/3 Center", "ULTRAWIDE TILING: 1/3 Center", "", function () {resizeAndMove(3, 1, 3, 1)});
-registerShortcut("ULTRAWIDE TILING: 1/3 Right", "ULTRAWIDE TILING: 1/3 Right", "", function () {resizeAndMove(3, 1, 3, 2)});
+// halves - 2x2 grid - top row
+registerShortcut("ULTRAWIDE TILING: Grid 2x2 Top-Left", "ULTRAWIDE TILING: Grid 2x2 Top-Left", "Meta+!", function () {resizeAndMove(2, 1, 2, 0, 2, 0)});
+//registerShortcut("ULTRAWIDE TILING: Grid 2x2 Top-Center", "ULTRAWIDE TILING: Grid 2x2 Top-Center", "", function () {resizeAndMove(2, 1, 4, 1, 2, 0)});
+registerShortcut("ULTRAWIDE TILING: Grid 2x2 Top-Right", "ULTRAWIDE TILING: Grid 2x2 Top-Right", "Meta+@", function () {resizeAndMove(2, 1, 2, 1, 2, 0)});
+// halves - Grid 2x2 grid - bottom row
+registerShortcut("ULTRAWIDE TILING: Grid 2x2 Bottom-Left", "ULTRAWIDE TILING: Grid 2x2 Bottom-Left", "Meta+#", function () {resizeAndMove(2, 1, 2, 0, 2, 1)});
+//registerShortcut("ULTRAWIDE TILING: Grid 2x2 Bottom-Center", "ULTRAWIDE TILING: Grid 2x2 Bottom-Center", "", function () {resizeAndMove(2, 1, 4, 1, 2, 1)});
+registerShortcut("ULTRAWIDE TILING: Grid 2x2 Bottom-Right", "ULTRAWIDE TILING: Grid 2x2 Bottom-Right", "Meta+$", function () {resizeAndMove(2, 1, 2, 1, 2, 1)});
+
+
+// thirds - full height
+registerShortcut("ULTRAWIDE TILING: 1/3 Left", "ULTRAWIDE TILING: 1/3 Left", "Meta+Ctrl+Left", function () {resizeAndMove(3, 1, 3, 0, 1, 1)});
+registerShortcut("ULTRAWIDE TILING: 1/3 Center", "ULTRAWIDE TILING: 1/3 Center", "Meta+Ctrl+Up", function () {resizeAndMove(3, 1, 3, 1, 1, 1)});
+registerShortcut("ULTRAWIDE TILING: 1/3 Right", "ULTRAWIDE TILING: 1/3 Right", "Meta+Ctrl+Right", function () {resizeAndMove(3, 1, 3, 2, 1, 1)});
+// thirds - 3x3 grid - top row
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Top-Left", "ULTRAWIDE TILING: Grid 3x3 Top-Left", "Meta+Alt+1", function () {resizeAndMove(3, 1, 3, 0, 3, 0)});
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Top-Center", "ULTRAWIDE TILING: Grid 3x3 Top-Center", "Meta+Alt+2", function () {resizeAndMove(3, 1, 3, 1, 3, 0)});
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Top-Right", "ULTRAWIDE TILING: Grid 3x3 Top-Right", "Meta+Alt+3", function () {resizeAndMove(3, 1, 3, 2, 3, 0)});
+// thirds - Grid 3x3 grid - middle row
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Middle-Left", "ULTRAWIDE TILING: Grid 3x3 Middle-Left", "Meta+Alt+4", function () {resizeAndMove(3, 1, 3, 0, 3, 1)});
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Middle-Center", "ULTRAWIDE TILING: Grid 3x3 Middle-Center", "Meta+Alt+5", function () {resizeAndMove(3, 1, 3, 1, 3, 1)});
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Middle-Right", "ULTRAWIDE TILING: Grid 3x3 Middle-Right", "Meta+Alt+6", function () {resizeAndMove(3, 1, 3, 2, 3, 1)});
+// thirds - Grid 3x3 grid - bottom row
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Bottom-Left", "ULTRAWIDE TILING: Grid 3x3 Bottom-Left", "Meta+Alt+7", function () {resizeAndMove(3, 1, 3, 0, 3, 2)});
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Bottom-Center", "ULTRAWIDE TILING: Grid 3x3 Bottom-Center", "Meta+Alt+8", function () {resizeAndMove(3, 1, 3, 1, 3, 2)});
+registerShortcut("ULTRAWIDE TILING: Grid 3x3 Bottom-Right", "ULTRAWIDE TILING: Grid 3x3 Bottom-Right", "Meta+Alt+9", function () {resizeAndMove(3, 1, 3, 2, 3, 2)});
+
 
 // two-thirds
-registerShortcut("ULTRAWIDE TILING: 2/3 Left", "ULTRAWIDE TILING: 2/3 Left", "", function () {resizeAndMove(3, 2, 6, 0)});
-registerShortcut("ULTRAWIDE TILING: 2/3 Center", "ULTRAWIDE TILING: 2/3 Center", "", function () {resizeAndMove(3, 2, 6, 1)});
-registerShortcut("ULTRAWIDE TILING: 2/3 Right", "ULTRAWIDE TILING: 2/3 Right", "", function () {resizeAndMove(3, 2, 6, 2)});
+registerShortcut("ULTRAWIDE TILING: 2/3 Left", "ULTRAWIDE TILING: 2/3 Left", "Meta+Ctrl+1", function () {resizeAndMove(3, 2, 6, 0, 1, 1)});
+registerShortcut("ULTRAWIDE TILING: 2/3 Center", "ULTRAWIDE TILING: 2/3 Center", "Meta+Ctrl+3", function () {resizeAndMove(3, 2, 6, 1, 1, 1)});
+registerShortcut("ULTRAWIDE TILING: 2/3 Right", "ULTRAWIDE TILING: 2/3 Right", "Meta+Ctrl+2", function () {resizeAndMove(3, 2, 6, 2, 1, 1)});
+
 
 // sixths
 registerShortcut("ULTRAWIDE TILING: 1/6 Left-Left", "ULTRAWIDE TILING: 1/6 Left-Left", "", function () {resizeAndMove(6, 1, 6, 0)});
